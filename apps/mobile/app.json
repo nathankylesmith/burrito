@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "DishSwipe",
+    "slug": "dishswipe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "scheme": "dishswipe",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dishswipe.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.dishswipe.app"
+    },
+    "web": {},
+    "plugins": [
+      "expo-router",
+      "expo-head"
+    ]
+  }
+}

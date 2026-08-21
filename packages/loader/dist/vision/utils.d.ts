@@ -1,0 +1,11 @@
+import type { DescribeDishPhotoParams } from './types.js';
+export declare const DEFAULT_DESCRIBE_PROMPT = "You are a food critic AI describing a restaurant dish photo.\nRespond with NOTHING except a single valid JSON object in the exact format below.\nDo NOT add prose, commentary, markdown fences, or extra keys.\n\n{\n  \"dish_guess\": string | null,\n  \"alternate_names\": string[],\n  \"caption\": string,\n  \"cuisine_guess\": string | null,\n  \"ingredients\": string[],\n  \"tags\": string[],\n  \"dietary_tags\": string[],\n  \"price_tier\": \"low\" | \"medium\" | \"high\" | \"premium\" | null,\n  \"price_estimate\": number | null,\n  \"confidence\": number (0-1)\n}\n\nIf unsure, use null or [] as appropriate.";
+export declare const DEFAULT_CLASSIFY_PROMPT = "You are an AI assistant that determines whether an image shows a prepared dish/meal.\nRespond with ONLY this JSON shape:\n{\n  \"is_dish\": true | false,\n  \"confidence\": number (0-1),\n  \"tags\": string[]\n}\n\nConsider plates, bowls, drinks, dessert cups as dishes. Interiors, exteriors, menus, people are not dishes.";
+export declare const sleep: (ms: number) => Promise<unknown>;
+export declare const normalizeStringArray: (value: unknown) => string[];
+export declare const coerceNumber: (value: unknown) => number | null;
+type GenericRecord = Record<string, unknown>;
+export declare const extractJsonCandidates: (raw: string) => string[];
+export declare const safeJsonParse: (raw: string) => GenericRecord | null;
+export declare const buildDescribePrompt: (template: string | undefined, context: DescribeDishPhotoParams) => string;
+export {};

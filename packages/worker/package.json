@@ -1,0 +1,14 @@
+{
+  "name": "@dishswipe/worker",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@dishswipe/core": "file:../core",
+    "@supabase/supabase-js": "^2.38.0"
+  }
+}

@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.expo
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+!packages/loader/dist/
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+*.swp
+*.swo
+*~
+
+# Generated loader and Supabase state
+packages/loader/tmp/
+supabase/.temp/
+
+# OS
+Thumbs.db
