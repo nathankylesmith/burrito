@@ -3,17 +3,17 @@ import { MatchModal } from "./components/MatchModal";
 import { Matches } from "./components/Matches";
 import { SwipeDeck } from "./components/SwipeDeck";
 import { Welcome } from "./components/Welcome";
-import { CITIES, curatedDeck, nearestCity } from "./data/cities";
+import { CVILLE, cvilleDeck, isNearCville } from "./data/cville";
 import { readBrowserLocation } from "./lib/geo";
 import { loadDeck } from "./lib/places";
 import { loadMatches, saveMatches, upsertMatch } from "./lib/storage";
-import type { City, Coords, Match, Spot, SwipeAction } from "./types";
+import type { Coords, Match, Spot, SwipeAction } from "./types";
 
 type Tab = "discover" | "matches";
 
 export default function App() {
   const [origin, setOrigin] = useState<Coords | null>(null);
-  const [locationLabel, setLocationLabel] = useState("Near you");
+  const [locationLabel, setLocationLabel] = useState("Charlottesville");
   const [spots, setSpots] = useState<Spot[]>([]);
   const [live, setLive] = useState(false);
   const [matches, setMatches] = useState<Match[]>(() => loadMatches());
@@ -28,7 +28,7 @@ export default function App() {
     [spots, seen],
   );
 
-  async function bootFromCoords(coords: Coords, label: string) {
+  async function boot(coords: Coords, label: string) {
     setBusy(true);
     setError(null);
     setOrigin(coords);
@@ -39,7 +39,7 @@ export default function App() {
       setSpots(deck.spots);
       setLive(deck.live);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not load nearby burritos.");
+      setError(err instanceof Error ? err.message : "Could not load Charlottesville burritos.");
     } finally {
       setBusy(false);
     }
@@ -50,20 +50,20 @@ export default function App() {
     setError(null);
     try {
       const coords = await readBrowserLocation();
-      const city = nearestCity(coords);
-      await bootFromCoords(coords, `Near ${city.name}`);
+      if (isNearCville(coords)) {
+        await boot(coords, "Near you in Cville");
+        return;
+      }
+      setError("You’re outside Charlottesville, so this is still the Cville list from downtown.");
+      await boot(CVILLE, "Charlottesville");
     } catch (err) {
-      setBusy(false);
       setError(
         err instanceof Error
-          ? `${err.message} Pick a city and we’ll still get you fed.`
-          : "Location is blocked. Pick a city instead.",
+          ? `${err.message} Using downtown Charlottesville instead.`
+          : "Location is blocked. Using downtown Charlottesville.",
       );
+      await boot(CVILLE, "Charlottesville");
     }
-  }
-
-  function pickCity(city: City) {
-    void bootFromCoords(city.coords, city.name);
   }
 
   function persist(next: Match[]) {
@@ -82,8 +82,7 @@ export default function App() {
   function resetDeck() {
     if (!origin) return;
     setSeen([]);
-    const city = CITIES.find((item) => item.name === locationLabel);
-    if (!live && city) setSpots(curatedDeck(city.id, origin));
+    if (!live) setSpots(cvilleDeck(origin));
   }
 
   return (
@@ -93,17 +92,22 @@ export default function App() {
           <button className="brand" onClick={() => { setOrigin(null); setTab("discover"); }}>
             FOIL
           </button>
-          <p>Tinder for burritos</p>
+          <p>Cville burritos</p>
         </header>
 
         {!origin ? (
-          <Welcome busy={busy} error={error} onLocate={() => void useMyLocation()} onPickCity={pickCity} />
+          <Welcome
+            busy={busy}
+            error={error}
+            onStart={() => void boot(CVILLE, "Charlottesville")}
+            onLocate={() => void useMyLocation()}
+          />
         ) : (
           <>
             {busy ? (
               <section className="loading">
                 <div className="spinner" aria-hidden="true" />
-                <p>Unwrapping spots near you…</p>
+                <p>Unwrapping Charlottesville…</p>
               </section>
             ) : tab === "discover" ? (
               <SwipeDeck

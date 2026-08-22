@@ -1,7 +1,7 @@
-import { fallbackDeck } from "../data/cities";
+import { CVILLE, cvilleDeck, localNames } from "../data/cville";
 import { photoForId } from "../data/photos";
 import type { Coords, Spot } from "../types";
-import { formatNeighborhood, haversineMiles, mapsUrl } from "./geo";
+import { haversineMiles, mapsUrl } from "./geo";
 
 type OverpassElement = {
   id: number;
@@ -13,42 +13,26 @@ type OverpassElement = {
 };
 
 const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const CHAINS = /taco bell|chipotle|torchy/i;
 
-function heatFor(name: string, tags: Record<string, string>, miles: number): number {
-  let score = 70;
-  const haystack = `${name} ${tags.cuisine ?? ""} ${tags.description ?? ""}`.toLowerCase();
-  if (haystack.includes("burrito")) score += 16;
-  if (haystack.includes("taqueria")) score += 10;
-  if (haystack.includes("mexican")) score += 6;
-  if (haystack.includes("tex-mex")) score += 5;
-  if (tags.website || tags.contact_website) score += 4;
-  if (tags.opening_hours) score += 3;
-  if (miles < 0.5) score += 6;
-  else if (miles < 1.5) score += 3;
-  return Math.max(68, Math.min(99, score));
+function addressFor(tags: Record<string, string>): string {
+  const number = tags["addr:housenumber"];
+  const street = tags["addr:street"];
+  if (number && street) return `${number} ${street}`;
+  return street ?? "Charlottesville";
 }
 
-function blurbFor(name: string, tags: Record<string, string>, miles: number): string {
-  const cuisine = (tags.cuisine ?? "").replaceAll(";", ", ");
-  if (name.toLowerCase().includes("burrito")) {
-    return "The name is doing a lot of the work. Swipe and find out if the foil holds up.";
-  }
-  if (cuisine.includes("mexican")) {
-    return miles < 1
-      ? "Close enough that the tortilla will still be warm when you get there."
-      : "A Mexican spot with burrito potential. Trust the heat score, then the salsa.";
-  }
-  return "OpenStreetMap thinks this is foil-adjacent. Your mouth gets the final vote.";
+function hoursFor(tags: Record<string, string>): string {
+  return tags.opening_hours?.replaceAll(";", " · ") ?? "Hours not listed";
 }
 
 function tagsFor(name: string, tags: Record<string, string>): string[] {
   const next = new Set<string>();
   const cuisine = (tags.cuisine ?? "").toLowerCase();
   if (name.toLowerCase().includes("burrito") || cuisine.includes("burrito")) next.add("burrito");
-  if (cuisine.includes("mexican")) next.add("mexican");
+  if (name.toLowerCase().includes("taqueria") || cuisine.includes("mexican")) next.add("mexican");
   if (cuisine.includes("tex-mex")) next.add("tex-mex");
   if (tags.takeaway === "yes") next.add("takeout");
-  if (tags.opening_hours?.includes("24/7")) next.add("24/7");
   if (next.size === 0) next.add("nearby");
   return [...next].slice(0, 3);
 }
@@ -59,23 +43,27 @@ function toSpot(element: OverpassElement, origin: Coords): Spot | null {
   const lat = element.lat ?? element.center?.lat;
   const lon = element.lon ?? element.center?.lon;
   if (!name || lat == null || lon == null) return null;
+  if (CHAINS.test(name)) return null;
 
   const coords = { lat, lon };
-  const distanceMiles = haversineMiles(origin, coords);
   const id = `osm-${element.type}-${element.id}`;
+  const address = addressFor(tags);
 
   return {
     id,
     name,
     lat,
     lon,
-    distanceMiles,
-    neighborhood: tags["addr:suburb"] || tags["addr:neighbourhood"] || formatNeighborhood(origin, coords),
-    blurb: blurbFor(name, tags, distanceMiles),
+    distanceMiles: haversineMiles(origin, coords),
+    neighborhood: tags["addr:suburb"] || tags["addr:neighbourhood"] || "Charlottesville",
+    address,
+    hours: hoursFor(tags),
+    phone: tags.phone ?? tags["contact:phone"] ?? null,
+    website: tags.website ?? tags["contact:website"] ?? null,
+    blurb: `${address}. Pulled from OpenStreetMap so we don’t miss a new counter.`,
     tags: tagsFor(name, tags),
     photo: photoForId(id),
-    heat: heatFor(name, tags, distanceMiles),
-    mapsUrl: mapsUrl(lat, lon, name),
+    mapsUrl: mapsUrl(lat, lon, `${name} ${address} Charlottesville VA`),
     source: "live",
   };
 }
@@ -99,7 +87,7 @@ export async function fetchLiveSpots(origin: Coords): Promise<Spot[]> {
   try {
     const response = await fetch(OVERPASS_URL, {
       method: "POST",
-      body: `data=${encodeURIComponent(buildOverpassQuery(origin, 7000))}`,
+      body: `data=${encodeURIComponent(buildOverpassQuery(origin, 16000))}`,
       headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
       signal: controller.signal,
     });
@@ -117,25 +105,27 @@ export async function fetchLiveSpots(origin: Coords): Promise<Spot[]> {
       spots.push(spot);
     }
 
-    return spots.sort((a, b) => a.distanceMiles - b.distanceMiles).slice(0, 30);
+    return spots.sort((a, b) => a.distanceMiles - b.distanceMiles);
   } finally {
     window.clearTimeout(timer);
   }
 }
 
-export async function loadDeck(origin: Coords): Promise<{ spots: Spot[]; live: boolean }> {
+export async function loadDeck(origin: Coords = CVILLE): Promise<{ spots: Spot[]; live: boolean }> {
+  const known = cvilleDeck(origin);
+  const knownNames = new Set(localNames());
+
   try {
     const live = await fetchLiveSpots(origin);
-    if (live.length >= 4) return { spots: live, live: true };
-    const curated = fallbackDeck(origin);
-    const merged = [...live];
-    for (const spot of curated) {
-      if (!merged.some((item) => item.name.toLowerCase() === spot.name.toLowerCase())) {
-        merged.push(spot);
-      }
-    }
-    return { spots: merged.sort((a, b) => a.distanceMiles - b.distanceMiles), live: live.length > 0 };
+    const extras = live.filter((spot) => {
+      const name = spot.name.toLowerCase();
+      return ![...knownNames].some((knownName) => name.includes(knownName) || knownName.includes(name));
+    });
+    return {
+      spots: [...known, ...extras].sort((a, b) => a.distanceMiles - b.distanceMiles),
+      live: true,
+    };
   } catch {
-    return { spots: fallbackDeck(origin), live: false };
+    return { spots: known, live: false };
   }
 }

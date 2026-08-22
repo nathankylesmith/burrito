@@ -17,14 +17,18 @@ export function MatchModal({ match, onKeepSwiping }: MatchModalProps) {
         <h2 id="match-title">You and {match.name} liked each other.</h2>
         <img src={match.photo} alt="" className="modal-photo" />
         <p className="modal-copy">
-          {superLiked
-            ? "You sent the extra salsa. This one jumped the line."
-            : "The foil is waiting. Don’t leave it on read."}
+          {match.address} · {match.hours}
+          {match.phone ? ` · ${match.phone}` : ""}
         </p>
         <div className="modal-actions">
           <a className="primary-btn" href={match.mapsUrl} target="_blank" rel="noreferrer">
             Get directions
           </a>
+          {match.phone ? (
+            <a className="ghost-btn" href={`tel:${match.phone}`}>
+              Call {match.phone}
+            </a>
+          ) : null}
           <button className="ghost-btn" onClick={onKeepSwiping}>
             Keep swiping
           </button>

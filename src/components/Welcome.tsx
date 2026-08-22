@@ -1,41 +1,30 @@
-import { CITIES } from "../data/cities";
-import type { City } from "../types";
-
 type WelcomeProps = {
   busy: boolean;
   error: string | null;
+  onStart: () => void;
   onLocate: () => void;
-  onPickCity: (city: City) => void;
 };
 
-export function Welcome({ busy, error, onLocate, onPickCity }: WelcomeProps) {
+export function Welcome({ busy, error, onStart, onLocate }: WelcomeProps) {
   return (
     <section className="welcome">
-      <p className="eyebrow">It’s not a restaurant app. It’s a type.</p>
+      <p className="eyebrow">Charlottesville, VA</p>
       <h1>
-        Swipe right
+        Swipe the
         <br />
-        on a burrito.
+        Cville deck.
       </h1>
       <p className="lede">
-        FOIL is Tinder for foil-wrapped destiny. We find the spots near you.
-        You decide if it’s a wrap.
+        Real spots: Barbie’s, El Comalito, Gomez, El Chavo, Mejicali, and the rest of
+        the foil circuit. Addresses and hours are on the card.
       </p>
-      <button className="primary-btn" disabled={busy} onClick={onLocate}>
-        {busy ? "Looking around…" : "Find burritos near me"}
+      <button className="primary-btn" disabled={busy} onClick={onStart}>
+        {busy ? "Unwrapping…" : "Find burritos in Charlottesville"}
+      </button>
+      <button className="ghost-btn locate-btn" disabled={busy} onClick={onLocate}>
+        I’m here — sort by my location
       </button>
       {error ? <p className="error">{error}</p> : null}
-      <div className="city-block">
-        <p className="city-label">Or start in a burrito city</p>
-        <div className="city-grid">
-          {CITIES.map((city) => (
-            <button key={city.id} className="city-chip" disabled={busy} onClick={() => onPickCity(city)}>
-              <strong>{city.name}</strong>
-              <span>{city.region}</span>
-            </button>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

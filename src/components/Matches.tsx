@@ -35,7 +35,7 @@ export function Matches({ matches, onClear }: MatchesProps) {
               <div>
                 <strong>{match.name}</strong>
                 <span>
-                  {formatDistance(match.distanceMiles)} · {match.neighborhood}
+                  {match.address} · {formatDistance(match.distanceMiles)}
                   {match.action === "super" ? " · super liked" : ""}
                 </span>
               </div>

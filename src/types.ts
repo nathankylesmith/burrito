@@ -10,12 +10,15 @@ export type Spot = {
   lon: number;
   distanceMiles: number;
   neighborhood: string;
+  address: string;
+  hours: string;
+  phone: string | null;
+  website: string | null;
   blurb: string;
   tags: string[];
   photo: string;
-  heat: number;
   mapsUrl: string;
-  source: "live" | "curated";
+  source: "cville" | "live";
 };
 
 export type SwipeAction = "nope" | "like" | "super";
@@ -23,12 +26,4 @@ export type SwipeAction = "nope" | "like" | "super";
 export type Match = Spot & {
   action: SwipeAction;
   matchedAt: number;
-};
-
-export type City = {
-  id: string;
-  name: string;
-  region: string;
-  coords: Coords;
-  vibe: string;
 };

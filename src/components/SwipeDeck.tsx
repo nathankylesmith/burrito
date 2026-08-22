@@ -63,14 +63,14 @@ export function SwipeDeck({
   if (!current) {
     return (
       <section className="deck empty-deck">
-        <h2>You wrapped the neighborhood.</h2>
-        <p>Either lower your standards or try another city. We both know which one you’ll pick.</p>
+        <h2>You wrapped Cville.</h2>
+        <p>That’s the whole foil circuit. Shuffle and argue about Barbie’s again.</p>
         <div className="modal-actions">
           <button className="primary-btn" onClick={onReset}>
             Shuffle the deck
           </button>
           <button className="ghost-btn" onClick={onChangeCity}>
-            Change city
+            Back to start
           </button>
         </div>
       </section>
@@ -84,7 +84,7 @@ export function SwipeDeck({
   return (
     <section className="deck">
       <div className="deck-meta">
-        <span>{live ? "Live nearby spots" : "Curated foil list"}</span>
+        <span>{live ? "Cville list + OSM extras" : "Cville list"}</span>
         <span>{locationLabel}</span>
       </div>
       <div className="stack">
@@ -123,11 +123,12 @@ export function SwipeDeck({
               <div className="card-copy">
                 <div className="card-title">
                   <h2>{spot.name}</h2>
-                  <p className="heat">{spot.heat}%</p>
+                  <p className="heat">{formatDistance(spot.distanceMiles)}</p>
                 </div>
                 <p className="card-sub">
-                  {formatDistance(spot.distanceMiles)} · {spot.neighborhood}
+                  {spot.address} · {spot.neighborhood}
                 </p>
+                <p className="card-hours">{spot.hours}</p>
                 <p className="card-blurb">{spot.blurb}</p>
                 <ul className="tag-row">
                   {spot.tags.map((tag) => (
