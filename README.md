@@ -12,7 +12,11 @@ Keeping it to burritos is the product, not a limitation. A generic restaurant sw
 
 The dating-app parody should stay light. “It’s a wrap” and a heat score are enough. The useful part is still: find a place near you, save the ones you like, get directions.
 
-## Run it
+## Try it
+
+Live preview: https://nathankylesmith.github.io/burrito/
+
+## Run it locally
 
 ```bash
 npm install
