@@ -1,4 +1,3 @@
-import { formatDistance } from "../lib/geo";
 import type { Match } from "../types";
 
 type MatchesProps = {
@@ -31,11 +30,13 @@ export function Matches({ matches, onClear }: MatchesProps) {
         {matches.map((match) => (
           <li key={match.id}>
             <a className="match-row" href={match.mapsUrl} target="_blank" rel="noreferrer">
-              <img src={match.photo} alt="" />
+              <img src={match.photos[0]} alt="" />
               <div>
                 <strong>{match.name}</strong>
                 <span>
-                  {match.address} · {formatDistance(match.distanceMiles)}
+                  {match.address}
+                  {match.rating != null ? ` · ${match.rating.toFixed(1)}★` : ""}
+                  {match.signature ? ` · ${match.signature.price}` : ""}
                   {match.action === "super" ? " · super liked" : ""}
                 </span>
               </div>

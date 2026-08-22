@@ -3,6 +3,17 @@ export type Coords = {
   lon: number;
 };
 
+export type Review = {
+  quote: string;
+  source: string;
+};
+
+export type MenuItem = {
+  name: string;
+  price: string;
+  ingredients: string[];
+};
+
 export type Spot = {
   id: string;
   name: string;
@@ -16,7 +27,15 @@ export type Spot = {
   website: string | null;
   blurb: string;
   tags: string[];
-  photo: string;
+  photos: string[];
+  photoCredit: string | null;
+  rating: number | null;
+  reviewCount: number | null;
+  ratingSource: string | null;
+  priceRange: string;
+  signature: MenuItem | null;
+  menu: MenuItem[];
+  reviews: Review[];
   mapsUrl: string;
   source: "cville" | "live";
 };

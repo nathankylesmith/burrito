@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatDistance } from "../lib/geo";
 import type { Spot, SwipeAction } from "../types";
 
@@ -28,8 +28,13 @@ export function SwipeDeck({
   onChangeCity,
 }: SwipeDeckProps) {
   const [drag, setDrag] = useState<DragState>({ x: 0, y: 0, dragging: false });
+  const [photoIndex, setPhotoIndex] = useState(0);
   const origin = useRef({ x: 0, y: 0 });
   const current = spots[0];
+
+  useEffect(() => {
+    setPhotoIndex(0);
+  }, [current?.id]);
 
   function finish(action: SwipeAction) {
     if (!current) return;
@@ -54,10 +59,15 @@ export function SwipeDeck({
   }
 
   function onPointerUp() {
-    if (!drag.dragging) return;
+    if (!drag.dragging || !current) return;
     if (drag.x > THRESHOLD) finish("like");
     else if (drag.x < -THRESHOLD) finish("nope");
-    else setDrag({ x: 0, y: 0, dragging: false });
+    else {
+      if (Math.hypot(drag.x, drag.y) < 12 && current.photos.length > 1) {
+        setPhotoIndex((index) => (index + 1) % current.photos.length);
+      }
+      setDrag({ x: 0, y: 0, dragging: false });
+    }
   }
 
   if (!current) {
@@ -84,12 +94,13 @@ export function SwipeDeck({
   return (
     <section className="deck">
       <div className="deck-meta">
-        <span>{live ? "Cville list + OSM extras" : "Cville list"}</span>
+        <span>{live ? "Cville menus + OSM extras" : "Cville menus"}</span>
         <span>{locationLabel}</span>
       </div>
       <div className="stack">
         {spots.slice(0, 3).map((spot, index) => {
           const isTop = index === 0;
+          const photo = isTop ? spot.photos[photoIndex] ?? spot.photos[0] : spot.photos[0];
           return (
             <article
               key={spot.id}
@@ -109,7 +120,7 @@ export function SwipeDeck({
               onPointerUp={isTop ? onPointerUp : undefined}
               onPointerCancel={isTop ? onPointerUp : undefined}
             >
-              <img src={spot.photo} alt={spot.name} draggable={false} />
+              <img src={photo} alt={spot.name} draggable={false} />
               {isTop ? (
                 <>
                   <div className="stamp like" style={{ opacity: likeOpacity }}>
@@ -118,6 +129,13 @@ export function SwipeDeck({
                   <div className="stamp nope" style={{ opacity: nopeOpacity }}>
                     NOPE
                   </div>
+                  {spot.photos.length > 1 ? (
+                    <div className="photo-dots" aria-hidden="true">
+                      {spot.photos.map((src) => (
+                        <span key={src} className={src === photo ? "on" : ""} />
+                      ))}
+                    </div>
+                  ) : null}
                 </>
               ) : null}
               <div className="card-copy">
@@ -126,15 +144,27 @@ export function SwipeDeck({
                   <p className="heat">{formatDistance(spot.distanceMiles)}</p>
                 </div>
                 <p className="card-sub">
+                  {spot.rating != null
+                    ? `${spot.rating.toFixed(1)} ★ (${spot.reviewCount} · ${spot.ratingSource}) · ${spot.priceRange}`
+                    : `${spot.priceRange} · rating not posted`}
+                </p>
+                <p className="card-sub">
                   {spot.address} · {spot.neighborhood}
                 </p>
                 <p className="card-hours">{spot.hours}</p>
-                <p className="card-blurb">{spot.blurb}</p>
-                <ul className="tag-row">
-                  {spot.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
-                  ))}
-                </ul>
+                {spot.signature ? (
+                  <p className="card-signature">
+                    <strong>{spot.signature.name}</strong> {spot.signature.price}
+                    <span>{spot.signature.ingredients.join(" · ")}</span>
+                  </p>
+                ) : null}
+                {spot.reviews[0] ? (
+                  <blockquote className="card-review">
+                    “{spot.reviews[0].quote}”
+                    <cite>{spot.reviews[0].source}</cite>
+                  </blockquote>
+                ) : null}
+                {spot.photoCredit ? <p className="photo-credit">Photo: {spot.photoCredit}</p> : null}
               </div>
             </article>
           );

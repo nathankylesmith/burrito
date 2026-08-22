@@ -15,8 +15,8 @@ export function Welcome({ busy, error, onStart, onLocate }: WelcomeProps) {
         Cville deck.
       </h1>
       <p className="lede">
-        Real spots: Barbie’s, El Comalito, Gomez, El Chavo, Mejicali, and the rest of
-        the foil circuit. Addresses and hours are on the card.
+        Real Cville menus, ratings, ingredients, reviews, and photos from the
+        restaurants. Tap a card photo to see the next shot. Prices move — call if you’re hungry.
       </p>
       <button className="primary-btn" disabled={busy} onClick={onStart}>
         {busy ? "Unwrapping…" : "Find burritos in Charlottesville"}

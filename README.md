@@ -2,7 +2,7 @@
 
 Tinder for Charlottesville burritos.
 
-Swipe real Cville spots: Barbie’s Burrito Barn, Taqueria El Comalito, Desayuna con Gomez, El Chavo, Mejicali, El Puerto, Brazos, and a few more. Each card has the address, hours, and a maps link.
+Swipe real Cville spots with restaurant photos, posted prices, ingredient lists, ratings, and short reviews. Barbie’s, El Comalito, Gomez, El Chavo, Mejicali, El Puerto, Brazos, and a few more.
 
 ## Try it
 
@@ -22,7 +22,7 @@ npm run build
 
 ## How it works
 
-- The deck is a Charlottesville list with real addresses and hours.
+- The deck is a Charlottesville list with real addresses, hours, menu prices, ingredients, ratings, and reviews. Photos come from the restaurants or local coverage.
 - If Overpass is up, extra OSM Mexican spots around town get mixed in. Chains stay out.
 - “I’m here” sorts by your location when you’re actually in Cville.
 - Matches stay in the browser.

@@ -1,6 +1,6 @@
 import type { Match } from "../types";
 
-const KEY = "foil-matches-cville-v1";
+const KEY = "foil-matches-cville-v2";
 
 export function loadMatches(): Match[] {
   try {

@@ -9,6 +9,8 @@ describe("cvilleDeck", () => {
     expect(names).toContain("Taqueria El Comalito");
     expect(names).toContain("Desayuna con Gomez");
     expect(deck.every((spot) => spot.address.length > 0)).toBe(true);
+    expect(deck.every((spot) => spot.photos.length > 0)).toBe(true);
+    expect(deck.find((spot) => spot.id === "cville-chavo-jpa")?.signature?.price).toBe("$13.00");
     expect(deck.every((spot) => spot.lat > 37.9 && spot.lat < 38.2)).toBe(true);
   });
 
