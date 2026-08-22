@@ -14,7 +14,7 @@ The dating-app parody should stay light. “It’s a wrap” and a heat score ar
 
 ## Try it
 
-Live preview: https://nathankylesmith.github.io/burrito/
+Live preview: https://raw.githack.com/nathankylesmith/burrito/gh-pages/index.html
 
 ## Run it locally
 

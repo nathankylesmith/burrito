@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://nathankylesmith.github.io/burrito/",
+  "homepage": "https://raw.githack.com/nathankylesmith/burrito/gh-pages/index.html",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
