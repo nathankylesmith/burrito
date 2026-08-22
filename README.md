@@ -14,7 +14,9 @@ The dating-app parody should stay light. “It’s a wrap” and a heat score ar
 
 ## Try it
 
-Live preview: https://raw.githack.com/nathankylesmith/burrito/gh-pages/index.html
+Open the repo in StackBlitz: https://stackblitz.com/github/nathankylesmith/burrito/tree/master
+
+That boots the Vite app in the browser. For a standing public URL, turn on GitHub Pages for the `gh-pages` branch at https://nathankylesmith.github.io/burrito/
 
 ## Run it locally
 
